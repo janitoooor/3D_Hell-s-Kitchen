@@ -1,11 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
+    public static Player Instance { get; private set; }
+
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public BaseCounter SelectedCounter;
+    }
+
+    [SerializeField] private Transform _kitchenObjectHoldPoint;
+    [Space]
     [SerializeField] private LayerMask _countersLayerMask;
     [SerializeField] private GameInput _gameInput;
     [Space]
@@ -15,8 +26,35 @@ public class Player : MonoBehaviour
     [SerializeField] private float _playerHight = 2f;
     [SerializeField] private float _raycastDistance = 2f;
 
+    private BaseCounter _selectedCounter;
+    private KitchenObject _kitchenObject;
+
     private bool _isWalking;
     public bool IsWalking { get => _isWalking; }
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        _gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    {
+        if (_selectedCounter != null)
+            _selectedCounter.Interact(this);
+    }
 
     private void Update()
     {
@@ -26,14 +64,22 @@ public class Player : MonoBehaviour
 
     private void HandleInteractions()
     {
-        //Vector2 inputVector = _gameInput.GetMovementVectorNormalize();
-        //Vector3 moveDirection = new(inputVector.x, 0, inputVector.y);
-
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit raycastHit, _raycastDistance,
             _countersLayerMask))
         {
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
-                clearCounter.Interact();
+            if (raycastHit.transform.TryGetComponent(out BaseCounter selectedCounter))
+            {
+                if (selectedCounter != _selectedCounter)
+                    SelectedCounter(selectedCounter);
+            }
+            else
+            {
+                SelectedCounter(null);
+            }
+        }
+        else
+        {
+            SelectedCounter(null);
         }
     }
 
@@ -65,12 +111,48 @@ public class Player : MonoBehaviour
             }
         }
 
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
+        if (moveDirection != transform.forward)
+            transform.forward = Vector3.Slerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
     }
 
     private bool PlayerCanMove(Vector3 moveDirection, float moveDistance)
     {
         return !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * _playerHight,
             _playerRadius, moveDirection, moveDistance);
+    }
+
+    private void SelectedCounter(BaseCounter selectedCounter)
+    {
+        _selectedCounter = selectedCounter;
+
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
+        {
+            SelectedCounter = selectedCounter
+        });
+    }
+
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return _kitchenObjectHoldPoint;
+    }
+
+    public bool HasKitchenObject()
+    {
+        return _kitchenObject != null;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        _kitchenObject = kitchenObject;
+    }
+
+    public void ClearKitchenObject()
+    {
+        _kitchenObject = null;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return _kitchenObject;
     }
 }

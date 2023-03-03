@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClearCounter : MonoBehaviour
+public class ClearCounter : BaseCounter
 {
-    public void Interact()
+    [SerializeField] private KitchenObjectSO _kitchenObjectSO;
+
+    public override void Interact(Player player)
     {
-        print("Interact");
+
     }
 }
