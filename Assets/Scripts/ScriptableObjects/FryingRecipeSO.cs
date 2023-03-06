@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu()]
+[CreateAssetMenu(menuName = "ScriptableObjects/CountersRecipe/FryingRecipeSO")]
 public class FryingRecipeSO : ScriptableObject
 {
     [SerializeField] private KitchenObjectSO _input;
