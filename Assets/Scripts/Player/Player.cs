@@ -9,6 +9,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 {
     public static Player Instance { get; private set; }
 
+    public event EventHandler OnPickSomething;
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
@@ -53,12 +54,18 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
     {
+        if (!KitchenGameManager.Instance.IsGamePlaying)
+            return;
+
         if (_selectedCounter != null)
             _selectedCounter.InteractAlternate(this);
     }
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
+        if (!KitchenGameManager.Instance.IsGamePlaying)
+            return;
+
         if (_selectedCounter != null)
             _selectedCounter.Interact(this);
     }
@@ -95,6 +102,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         Vector2 inputVector = _gameInput.GetMovementVectorNormalize();
         Vector3 moveDirection = new(inputVector.x, 0, inputVector.y);
         float moveDistance = _speed * Time.deltaTime;
+        float deadZoneValue = 0.5f;
 
         if (PlayerCanMove(moveDirection, moveDistance))
         {
@@ -105,7 +113,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         {
             Vector3 moveX = new Vector3(moveDirection.x, 0, 0).normalized;
             _isWalking = moveX != Vector3.zero;
-            if (PlayerCanMove(moveX, moveDistance))
+            if ((moveDirection.x < -deadZoneValue || moveDirection.x > deadZoneValue) && PlayerCanMove(moveX, moveDistance))
             {
                 transform.position += moveDistance * moveX;
             }
@@ -113,7 +121,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             {
                 Vector3 moveZ = new Vector3(0, 0, moveDirection.z).normalized;
                 _isWalking = moveZ != Vector3.zero;
-                if (PlayerCanMove(moveZ, moveDistance))
+                if ((moveDirection.z < -deadZoneValue || moveDirection.z > deadZoneValue) && PlayerCanMove(moveZ, moveDistance))
                     transform.position += moveDistance * moveZ;
             }
         }
@@ -151,6 +159,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         _kitchenObject = kitchenObject;
+
+        if (kitchenObject != null)
+            OnPickSomething?.Invoke(this, EventArgs.Empty);
     }
 
     public void ClearKitchenObject()
