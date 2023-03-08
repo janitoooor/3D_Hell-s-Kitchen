@@ -51,6 +51,9 @@ public class OptionsUI : MonoBehaviour
 
     private Action OnCloseButtonAction;
 
+    private readonly string _soundString = "Sounds Effects: ";
+    private readonly string _musicString = "Music: ";
+
     private void Awake()
     {
         Instance = this;
@@ -128,8 +131,8 @@ public class OptionsUI : MonoBehaviour
     private void UpdateVisual()
     {
         float multiplyValue = 10f;
-        _soundEffectsText.text = $"Sounds Effects: {Mathf.Round(SoundsEffects.Instance.Volume * multiplyValue)}";
-        _musicText.text = $"Music: {Mathf.Round(BackgroundMusic.Instance.Volume * multiplyValue)}";
+        _soundEffectsText.text = _soundString + Mathf.Round(SoundsEffects.Instance.Volume * multiplyValue);
+        _musicText.text = _musicString + Mathf.Round(BackgroundMusic.Instance.Volume * multiplyValue);
 
         _moveUpButtonText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Move_Up);
         _moveDownButtonText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Move_Down);

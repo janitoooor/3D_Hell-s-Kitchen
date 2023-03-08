@@ -24,7 +24,7 @@ public class KitchenObject : MonoBehaviour
         transform.localPosition = Vector3.zero;
     }
 
-    public void DestroySelf()
+    public virtual void DestroySelf()
     {
         _kitchenObjectParent.ClearKitchenObject();
         Destroy(gameObject);

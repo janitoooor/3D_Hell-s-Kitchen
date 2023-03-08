@@ -108,6 +108,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         {
             _isWalking = moveDirection != Vector3.zero;
             transform.position += moveDistance * moveDirection;
+
         }
         else
         {
@@ -120,9 +121,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             else
             {
                 Vector3 moveZ = new Vector3(0, 0, moveDirection.z).normalized;
-                _isWalking = moveZ != Vector3.zero;
+                if (_isWalking)
+                    _isWalking = moveZ != Vector3.zero;
                 if ((moveDirection.z < -deadZoneValue || moveDirection.z > deadZoneValue) && PlayerCanMove(moveZ, moveDistance))
                     transform.position += moveDistance * moveZ;
+                else
+                    _isWalking = false;
             }
         }
 

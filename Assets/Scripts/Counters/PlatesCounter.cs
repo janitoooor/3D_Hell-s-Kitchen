@@ -13,9 +13,9 @@ public class PlatesCounter : BaseCounter
     [SerializeField] private float _spawnPlateTimerMax = 4;
     [SerializeField] private int _platesSpawnedAmountMax = 2;
 
-
     private int _platesSpawnedAmount;
     private float _spawnPlateTimer;
+
     private void Update()
     {
         _spawnPlateTimer += Time.deltaTime;
@@ -23,7 +23,7 @@ public class PlatesCounter : BaseCounter
         {
             _spawnPlateTimer = 0;
 
-            if (_platesSpawnedAmount < _platesSpawnedAmountMax)
+            if (KitchenGameManager.Instance.IsGamePlaying && _platesSpawnedAmount < _platesSpawnedAmountMax)
             {
                 _platesSpawnedAmount++;
                 OnPlateSpawned?.Invoke(this, EventArgs.Empty);
@@ -35,10 +35,14 @@ public class PlatesCounter : BaseCounter
     {
         if (!player.HasKitchenObject() && _platesSpawnedAmount > 0)
         {
-            _platesSpawnedAmount--;
-            KitchenObject.SpawnKitchenObject(_plateKitchenObjectSO, player);
-
+            PlateKitchenObject plateKitchenObject = KitchenObject.SpawnKitchenObject(_plateKitchenObjectSO, player) as PlateKitchenObject;
+            plateKitchenObject.OnPlateDestroyed += PlateKitchenObject_OnPlateDestroyed;
             OnPlateRemoved?.Invoke(this, EventArgs.Empty);
         }
+    }
+
+    private void PlateKitchenObject_OnPlateDestroyed(object sender, EventArgs e)
+    {
+        _platesSpawnedAmount--;
     }
 }

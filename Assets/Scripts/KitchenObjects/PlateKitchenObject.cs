@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class PlateKitchenObject : KitchenObject
 {
+    public event EventHandler OnPlateDestroyed;
+
     public event EventHandler<OnIngredientAddedEventArgs> OnIngredientAdded;
     public class OnIngredientAddedEventArgs : EventArgs
     {
         public KitchenObjectSO KitchenObjectSO;
     }
-
 
     [SerializeField] private List<KitchenObjectSO> _validKitchenObjectSOList;
 
@@ -41,5 +42,12 @@ public class PlateKitchenObject : KitchenObject
             });
             return true;
         }
+    }
+
+    public override void DestroySelf()
+    {
+        OnPlateDestroyed?.Invoke(this, EventArgs.Empty);
+        OnPlateDestroyed = null;
+        base.DestroySelf();
     }
 }
