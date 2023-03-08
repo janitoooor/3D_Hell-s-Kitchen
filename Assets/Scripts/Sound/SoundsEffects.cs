@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ public class SoundsEffects : MonoBehaviour
     public const string PLAYER_PREFS_SOUND_EFFECTS_VOLUME = "SoundsEffectsVolume";
 
     public static SoundsEffects Instance;
+
+    public event EventHandler OnVolumeChanged;
 
     [Range(0f, 1f)]
     [SerializeField] private float _volume = 1f;
@@ -46,6 +49,7 @@ public class SoundsEffects : MonoBehaviour
 
         PlayerPrefs.SetFloat(PLAYER_PREFS_SOUND_EFFECTS_VOLUME, _volume);
         PlayerPrefs.Save();
+        OnVolumeChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void TrashCounter_OnAnyObjectTrashed(object sender, System.EventArgs e)
@@ -88,11 +92,21 @@ public class SoundsEffects : MonoBehaviour
 
     private void PlaySound(AudioClip[] audioClipArray, Vector3 position, float volumeMultiplier = 1f)
     {
-        PlaySound(audioClipArray[Random.Range(0, audioClipArray.Length)], position, volumeMultiplier * _volume);
+        PlaySound(audioClipArray[UnityEngine.Random.Range(0, audioClipArray.Length)], position, volumeMultiplier * _volume);
     }
 
     public void PlayFootStepsSound(Vector3 position, float volumeMultiplier = 1f)
     {
-        PlaySound(_audioClipRefsSO.FootStep[Random.Range(0, _audioClipRefsSO.FootStep.Length)], position, volumeMultiplier * _volume);
+        PlaySound(_audioClipRefsSO.FootStep[UnityEngine.Random.Range(0, _audioClipRefsSO.FootStep.Length)], position, volumeMultiplier * _volume);
+    }
+
+    public void PlayCountdownSound()
+    {
+        PlaySound(_audioClipRefsSO.Warning, Vector3.zero);
+    }
+
+    public void PlayBurnWarningSound(Vector3 position)
+    {
+        PlaySound(_audioClipRefsSO.Warning, position);
     }
 }

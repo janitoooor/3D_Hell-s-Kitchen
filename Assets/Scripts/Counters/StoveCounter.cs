@@ -24,6 +24,8 @@ public class StoveCounter : BaseCounter, IHasProgress
     [SerializeField] private BurningRecipeSO[] _burningRecipeSOArray;
     [SerializeField] private FryingRecipeSO[] _fryingRecipeSOArray;
 
+    public bool IsFried { get => _state == State.Fried; }
+
     private State _state;
     private float _fryingTimer;
     private float _burningTimer;

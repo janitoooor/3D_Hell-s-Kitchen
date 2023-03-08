@@ -81,9 +81,12 @@ public class DeliveryManager : MonoBehaviour
 
         if (_waitingRecipesAmountMax > _waitingRecipeSOList.Count)
         {
-            RecipeSO waitingRecipeSO = _recipeListSO.RecipeSOList[UnityEngine.Random.Range(0, _recipeListSO.RecipeSOList.Count)];
-            _waitingRecipeSOList.Add(waitingRecipeSO);
-            OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+            if (KitchenGameManager.Instance.IsGamePlaying)
+            {
+                RecipeSO waitingRecipeSO = _recipeListSO.RecipeSOList[UnityEngine.Random.Range(0, _recipeListSO.RecipeSOList.Count)];
+                _waitingRecipeSOList.Add(waitingRecipeSO);
+                OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+            }
             if (_waitingRecipesAmountMax > _waitingRecipeSOList.Count)
                 StartCoroutine(SpawnRecipeTimer());
         }
