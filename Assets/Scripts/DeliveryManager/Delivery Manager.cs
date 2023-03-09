@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class DeliveryManager : MonoBehaviour
+public class DeliveryManager : NetworkBehaviour
 {
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
@@ -31,7 +32,7 @@ public class DeliveryManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(SpawnRecipeTimer());
+        StartCoroutine(CheckIsServer());
     }
 
     public void DeliveryRecipe(PlateKitchenObject plateKitchenObject)
@@ -62,17 +63,49 @@ public class DeliveryManager : MonoBehaviour
 
                 if (plateContentsMatchesRecipe)
                 {
-                    _successfulRecipesAmount++;
-                    _waitingRecipeSOList.RemoveAt(i);
-                    OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
-                    OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
-                    StartCoroutine(SpawnRecipeTimer());
+                    DeliveryCorrectRecipeServerRpc(i);
                     return;
                 }
             }
         }
 
+        DeliveryIncorrectRecipeServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliveryIncorrectRecipeServerRpc()
+    {
+        DeliveryIncorrectRecipeClientRpc();
+    }
+
+    [ClientRpc]
+    private void DeliveryIncorrectRecipeClientRpc()
+    {
         OnRecipeFailed?.Invoke(this, EventArgs.Empty);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliveryCorrectRecipeServerRpc(int waitingRecipeSOListIndex)
+    {
+        DeliveryCorrectRecipeClientRpc(waitingRecipeSOListIndex);
+    }
+
+    [ClientRpc]
+    private void DeliveryCorrectRecipeClientRpc(int waitingRecipeSOListIndex)
+    {
+        _successfulRecipesAmount++;
+        _waitingRecipeSOList.RemoveAt(waitingRecipeSOListIndex);
+        OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+        OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+        StartCoroutine(SpawnRecipeTimer());
+    }
+
+    [ClientRpc]
+    private void SpawnNewWaitingRecipeClientRpc(int indexWaitingRecipeSO)
+    {
+        RecipeSO waitingRecipeSO = _recipeListSO.RecipeSOList[indexWaitingRecipeSO];
+        _waitingRecipeSOList.Add(waitingRecipeSO);
+        OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     private IEnumerator SpawnRecipeTimer()
@@ -83,12 +116,21 @@ public class DeliveryManager : MonoBehaviour
         {
             if (KitchenGameManager.Instance.IsGamePlaying)
             {
-                RecipeSO waitingRecipeSO = _recipeListSO.RecipeSOList[UnityEngine.Random.Range(0, _recipeListSO.RecipeSOList.Count)];
-                _waitingRecipeSOList.Add(waitingRecipeSO);
-                OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+                int indexWaitingRecipeSO = UnityEngine.Random.Range(0, _recipeListSO.RecipeSOList.Count);
+                SpawnNewWaitingRecipeClientRpc(indexWaitingRecipeSO);
             }
             if (_waitingRecipesAmountMax > _waitingRecipeSOList.Count)
                 StartCoroutine(SpawnRecipeTimer());
         }
+    }
+
+    private IEnumerator CheckIsServer()
+    {
+        yield return new WaitForSeconds(1);
+
+        if (IsServer)
+            StartCoroutine(SpawnRecipeTimer());
+        else
+            StartCoroutine(CheckIsServer());
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public interface IKitchenObjectParent
@@ -13,4 +14,6 @@ public interface IKitchenObjectParent
     public void ClearKitchenObject();
 
     public KitchenObject GetKitchenObject();
+
+    public NetworkObject GetNetworkObject();
 }

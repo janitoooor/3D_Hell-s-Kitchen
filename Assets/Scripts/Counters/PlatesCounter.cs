@@ -35,8 +35,8 @@ public class PlatesCounter : BaseCounter
     {
         if (!player.HasKitchenObject() && _platesSpawnedAmount > 0)
         {
-            PlateKitchenObject plateKitchenObject = KitchenObject.SpawnKitchenObject(_plateKitchenObjectSO, player) as PlateKitchenObject;
-            plateKitchenObject.OnPlateDestroyed += PlateKitchenObject_OnPlateDestroyed;
+            //PlateKitchenObject plateKitchenObject = KitchenObject.SpawnKitchenObject(_plateKitchenObjectSO, player) as PlateKitchenObject;
+            //plateKitchenObject.OnPlateDestroyed += PlateKitchenObject_OnPlateDestroyed;
             OnPlateRemoved?.Invoke(this, EventArgs.Empty);
         }
     }

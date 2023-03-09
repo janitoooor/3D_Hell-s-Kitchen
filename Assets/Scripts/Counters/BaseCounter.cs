@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 {
     public static event EventHandler OnAnyObjectPlacedHere;
-    public static void ResetStaticData()
-    {
-        OnAnyObjectPlacedHere = null;
-    }
+    public static void ResetStaticData() => OnAnyObjectPlacedHere = null;
 
     [SerializeField] private Transform _counterTopPoint;
 
@@ -51,5 +49,10 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     public KitchenObject GetKitchenObject()
     {
         return _kitchenObject;
+    }
+
+    public NetworkObject GetNetworkObject()
+    {
+        return null;
     }
 }
