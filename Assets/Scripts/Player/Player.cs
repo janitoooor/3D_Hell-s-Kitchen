@@ -1,13 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
-    public static Player Instance { get; private set; }
+    public static event EventHandler OnAnyPlayerSpawned;
+    public static event EventHandler OnAnyPickedSomething;
+
+    public static void ResetStaticData()
+    {
+        OnAnyPlayerSpawned = null;
+        OnAnyPickedSomething = null;
+    }
+
+    public static Player LocalInstance { get; private set; }
 
     public event EventHandler OnPickSomething;
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
@@ -32,24 +42,64 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private bool _isWalking;
     public bool IsWalking { get => _isWalking; }
-
-    private void Awake()
+    private void Start()
     {
-        if (Instance != null)
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+        GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+    }
+
+    private void Update()
+    {
+        if (!IsOwner)
+            return;
+
+        HandleMovement();
+        HandleInteractions();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
         {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            LocalInstance = this;
+            OnAnyPlayerSpawned(this, EventArgs.Empty);
         }
     }
 
-    private void Start()
+    public Transform GetKitchenObjectFollowTransform()
     {
-        _gameInput.OnInteractAction += GameInput_OnInteractAction;
-        _gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        return _kitchenObjectHoldPoint;
+    }
+
+    public bool HasKitchenObject()
+    {
+        return _kitchenObject != null;
+    }
+
+    public NetworkObject GetNetworkObject()
+    {
+        return NetworkObject;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        _kitchenObject = kitchenObject;
+
+        if (kitchenObject != null)
+        {
+            OnPickSomething?.Invoke(this, EventArgs.Empty);
+            OnAnyPickedSomething?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public void ClearKitchenObject()
+    {
+        _kitchenObject = null;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return _kitchenObject;
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -68,12 +118,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         if (_selectedCounter != null)
             _selectedCounter.Interact(this);
-    }
-
-    private void Update()
-    {
-        HandleMovement();
-        HandleInteractions();
     }
 
     private void HandleInteractions()
@@ -99,7 +143,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void HandleMovement()
     {
-        Vector2 inputVector = _gameInput.GetMovementVectorNormalize();
+        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalize();
         Vector3 moveDirection = new(inputVector.x, 0, inputVector.y);
         float moveDistance = _speed * Time.deltaTime;
         float deadZoneValue = 0.5f;
@@ -150,31 +194,4 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         });
     }
 
-    public Transform GetKitchenObjectFollowTransform()
-    {
-        return _kitchenObjectHoldPoint;
-    }
-
-    public bool HasKitchenObject()
-    {
-        return _kitchenObject != null;
-    }
-
-    public void SetKitchenObject(KitchenObject kitchenObject)
-    {
-        _kitchenObject = kitchenObject;
-
-        if (kitchenObject != null)
-            OnPickSomething?.Invoke(this, EventArgs.Empty);
-    }
-
-    public void ClearKitchenObject()
-    {
-        _kitchenObject = null;
-    }
-
-    public KitchenObject GetKitchenObject()
-    {
-        return _kitchenObject;
-    }
 }

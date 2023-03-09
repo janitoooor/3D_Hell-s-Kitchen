@@ -13,7 +13,7 @@ public class KitchenGameManager : MonoBehaviour
 
     [SerializeField] private GameStartCountdownUI _gameStartCountdownUI;
     [Space]
-    [SerializeField] private float _countdownToStartTimer = 3f;
+    [SerializeField] private float _countdownToStartTimer = 1f;
     [SerializeField] private float _gamePlayingTimer = 10f;
     [SerializeField] private float _chekStateTimer = 1f;
 
@@ -44,6 +44,10 @@ public class KitchenGameManager : MonoBehaviour
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+
+        _state = State.CountdownToStart;
+        StartCoroutine(ChekStateTimer());
+        OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void GameInput_OnInteractAction(object sender, EventArgs e)

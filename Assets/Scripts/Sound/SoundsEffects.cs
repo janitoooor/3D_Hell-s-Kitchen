@@ -31,7 +31,7 @@ public class SoundsEffects : MonoBehaviour
 
     private void Start()
     {
-        Player.Instance.OnPickSomething += Player_OnPickSomething;
+        Player.OnAnyPickedSomething += Player_OnPickSomething;
         DeliveryManager.Instance.OnRecipeSuccess += DeliveryManager_OnRecipeSuccess;
         DeliveryManager.Instance.OnRecipeFailed += DeliveryManager_OnRecipeFailed;
         CuttingCounter.OnAnyCut += CuttingCounter_OnAnyCut;
@@ -52,35 +52,36 @@ public class SoundsEffects : MonoBehaviour
         OnVolumeChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void TrashCounter_OnAnyObjectTrashed(object sender, System.EventArgs e)
+    private void TrashCounter_OnAnyObjectTrashed(object sender, EventArgs e)
     {
         TrashCounter trashCounter = sender as TrashCounter;
         PlaySound(_audioClipRefsSO.Trash, trashCounter.transform.position);
     }
 
-    private void BaseCounter_OnAnyObjectPlacedHere(object sender, System.EventArgs e)
+    private void BaseCounter_OnAnyObjectPlacedHere(object sender, EventArgs e)
     {
         BaseCounter baseCounter = sender as BaseCounter;
         PlaySound(_audioClipRefsSO.ObjectPickup, baseCounter.transform.position);
     }
 
-    private void Player_OnPickSomething(object sender, System.EventArgs e)
+    private void Player_OnPickSomething(object sender, EventArgs e)
     {
-        PlaySound(_audioClipRefsSO.ObjectPickup, Player.Instance.transform.position);
+        Player player = sender as Player;
+        PlaySound(_audioClipRefsSO.ObjectPickup, player.transform.position);
     }
 
-    private void CuttingCounter_OnAnyCut(object sender, System.EventArgs e)
+    private void CuttingCounter_OnAnyCut(object sender, EventArgs e)
     {
         CuttingCounter cuttingCounter = sender as CuttingCounter;
         PlaySound(_audioClipRefsSO.Chop, cuttingCounter.transform.position);
     }
 
-    private void DeliveryManager_OnRecipeFailed(object sender, System.EventArgs e)
+    private void DeliveryManager_OnRecipeFailed(object sender, EventArgs e)
     {
         PlaySound(_audioClipRefsSO.DeliveryFail, _deliveryCounter.transform.position);
     }
 
-    private void DeliveryManager_OnRecipeSuccess(object sender, System.EventArgs e)
+    private void DeliveryManager_OnRecipeSuccess(object sender, EventArgs e)
     {
         PlaySound(_audioClipRefsSO.DeliverySuccess, _deliveryCounter.transform.position);
     }
