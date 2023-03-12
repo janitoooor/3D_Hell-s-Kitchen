@@ -66,7 +66,7 @@ public class StoveCounter : BaseCounter, IHasProgress
     {
         if (!HasKitchenObject())
             GetKitchenObjectAndStartCook(player);
-        else
+        else if (_state.Value == State.Fried || _state.Value == State.Burned)
             GivePlayerKitchenObject(player);
     }
 

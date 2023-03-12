@@ -89,7 +89,7 @@ MonoBehaviour:
   _countersLayerMask:
     serializedVersion: 2
     m_Bits: 64
-  _rotateSpeed: 17
+  _rotateSpeed: 15
   _speed: 6
   _playerRadius: 0.8
   _raycastDistance: 2
