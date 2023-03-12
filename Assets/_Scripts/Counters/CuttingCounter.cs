@@ -32,7 +32,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
                 InteractLogicPlaceObjectOnCounterServerRpc();
             }
         }
-        else
+        else if (_cuttingProgress == 0)
         {
             if (!player.HasKitchenObject())
             {
@@ -91,8 +91,6 @@ public class CuttingCounter : BaseCounter, IHasProgress
         {
             ProgressNormalized = _cuttingProgress / (float)cuttingRecipeSO.CuttingProgressMax
         });
-
-
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -105,7 +103,14 @@ public class CuttingCounter : BaseCounter, IHasProgress
             KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().KitchenObjectSO);
             KitchenObject.DestroyKitchenObject(GetKitchenObject());
             KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
+            ResetCuttingProgressClientRpc();
         }
+    }
+
+    [ClientRpc]
+    private void ResetCuttingProgressClientRpc()
+    {
+        _cuttingProgress = 0;
     }
 
     private bool HasRecipeWithInput(KitchenObjectSO kitchenObjectSO)
