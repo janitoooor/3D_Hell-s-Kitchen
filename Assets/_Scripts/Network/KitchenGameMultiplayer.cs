@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Unity.Netcode.NetworkManager;
@@ -9,6 +11,8 @@ using static Unity.Netcode.NetworkManager;
 public class KitchenGameMultiplayer : NetworkBehaviour
 {
     public const int MAX_PLAYERS_AMOUNT = 4;
+    private const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
+
 
     public static KitchenGameMultiplayer Instance { get; private set; }
 
@@ -17,24 +21,35 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     public event EventHandler OnPlayerDataNetworkListChanged;
 
     [SerializeField] private KitchenObjectListSO _kitchenObjectListSO;
-    [SerializeField] private List<Color> _playerColorList;
+    [SerializeField] private List<UnityEngine.Color> _playerColorList;
     [Space]
     [Multiline][SerializeField] private string _connectionApprovalResponseReasonStringGameStarting = "Game Has already started";
     [Multiline][SerializeField] private string _connectionApprovalResponseReasonStringIsMaxPlayers = "Game is full";
 
     private NetworkList<PlayerData> _playerDataNetworkList;
 
+    private string _playerName;
+    public string PlayerName { get => _playerName; }
+
     private void Awake()
     {
         Instance = this;
-
         DontDestroyOnLoad(this);
+
+        _playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName_" + UnityEngine.Random.Range(100, 1000));
+
         _playerDataNetworkList = new();
         _playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
     }
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
         OnPlayerDataNetworkListChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public void SetPlayerName(string playerName)
+    {
+        _playerName = playerName;
+
+        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
 
     public void StartHost()
@@ -68,6 +83,9 @@ public class KitchenGameMultiplayer : NetworkBehaviour
             ClientId = clientId,
             ColorId = GetFirstUnusedColorId(),
         });
+
+        SetPlayerNameServerRpc(_playerName);
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
     }
 
     public void StartClient()
@@ -75,7 +93,34 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         OnTryingToJoingGame?.Invoke(this, EventArgs.Empty);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
+    }
+
+    private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
+    {
+        SetPlayerNameServerRpc(_playerName);
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = _playerDataNetworkList[playerDataIndex];
+
+        playerData.PlayerName = playerName;
+        _playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerIdServerRpc(string playerId, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = _playerDataNetworkList[playerDataIndex];
+
+        playerData.PlayerId = playerId;
+        _playerDataNetworkList[playerDataIndex] = playerData;
     }
 
     private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
@@ -162,7 +207,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         return _playerDataNetworkList[playerIndex];
     }
 
-    public Color GetPlayerColor(int colorId)
+    public UnityEngine.Color GetPlayerColor(int colorId)
     {
         return _playerColorList[colorId];
     }
