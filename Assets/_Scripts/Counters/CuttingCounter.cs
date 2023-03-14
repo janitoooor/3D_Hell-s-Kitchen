@@ -68,14 +68,15 @@ public class CuttingCounter : BaseCounter, IHasProgress
         if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().KitchenObjectSO))
         {
             CutObjectServerRpc();
+            TestCuttingProgressDoneServerRpc();
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void CutObjectServerRpc()
     {
-        CutObjectClientRpc();
-        TestCuttingProgressDoneServerRpc();
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().KitchenObjectSO))
+            CutObjectClientRpc();
     }
 
     [ClientRpc]
