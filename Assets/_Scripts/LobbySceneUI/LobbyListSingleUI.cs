@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class LobbyListSingleUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _lobbyNameText;
+    [SerializeField] private TextMeshProUGUI _lobbyAmountPlayerText;
 
     private Lobby _lobby;
 
@@ -23,5 +24,6 @@ public class LobbyListSingleUI : MonoBehaviour
     {
         _lobby = lobby;
         _lobbyNameText.text = _lobby.Name;
+        _lobbyAmountPlayerText.text = _lobby.Players.Count + " / " + _lobby.MaxPlayers;
     }
 }

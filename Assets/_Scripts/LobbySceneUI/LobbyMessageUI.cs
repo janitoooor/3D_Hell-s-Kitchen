@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,6 +38,16 @@ public class LobbyMessageUI : MonoBehaviour
         Hide();
     }
 
+    private void OnDestroy()
+    {
+        KitchenGameMultiplayer.Instance.OnFailedToJoingGame -= KitchenGameMultiplayer_OnFailedToJoingGame;
+        KitchenGameLobby.Instance.OnCreateLobbyStarted -= KitchenGameLobby_OnCreateLobbyStarted;
+        KitchenGameLobby.Instance.OnCreateLobbyFailed -= KitchenGameLobby_OnCreateLobbyFailed;
+        KitchenGameLobby.Instance.OnJoinStarted -= KitchenGameLobby_OnJoinStarted;
+        KitchenGameLobby.Instance.OnJoinFailed -= KitchenGameLobby_OnJoinFailed;
+        KitchenGameLobby.Instance.OnQuickJoinFailed -= KitchenGameLobby_OnQuickJoinFailed;
+    }
+
     private void KitchenGameLobby_OnQuickJoinFailed(object sender, System.EventArgs e)
     {
         ShowMessage(_failedToQuickJoinLobbyString);
@@ -66,11 +77,6 @@ public class LobbyMessageUI : MonoBehaviour
     {
         Show();
         _messageText.text = message;
-    }
-
-    private void OnDestroy()
-    {
-        KitchenGameMultiplayer.Instance.OnFailedToJoingGame -= KitchenGameMultiplayer_OnFailedToJoingGame;
     }
     private void KitchenGameMultiplayer_OnFailedToJoingGame(object sender, System.EventArgs e)
     {
