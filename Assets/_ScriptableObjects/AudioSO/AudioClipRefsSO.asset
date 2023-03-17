@@ -43,3 +43,5 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b59c98e0066c41f42b8100f5cb180f5b, type: 3}
   _stoveSizzle:
   - {fileID: 8300000, guid: 511c1cbfb8b48b64083aec78fe17115f, type: 3}
+  _warningTimer:
+  - {fileID: 8300000, guid: c5e2a73ad4706440f93bf05df0b465fe, type: 3}

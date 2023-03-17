@@ -34,7 +34,6 @@ public class DeliveryManager : NetworkBehaviour
     {
         StartCoroutine(CheckIsServer());
     }
-
     public void DeliveryRecipe(PlateKitchenObject plateKitchenObject)
     {
         for (int i = 0; i < _waitingRecipeSOList.Count; i++)
@@ -105,6 +104,7 @@ public class DeliveryManager : NetworkBehaviour
     {
         RecipeSO waitingRecipeSO = _recipeListSO.RecipeSOList[indexWaitingRecipeSO];
         _waitingRecipeSOList.Add(waitingRecipeSO);
+        int indexRecipe = _waitingRecipeSOList.Count - 1;
         OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
     }
 
