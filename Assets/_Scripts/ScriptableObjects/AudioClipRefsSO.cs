@@ -14,6 +14,7 @@ public class AudioClipRefsSO : ScriptableObject
     [SerializeField] private AudioClip[] _trash;
     [SerializeField] private AudioClip[] _warning;
     [SerializeField] private AudioClip[] _stoveSizzle;
+    [SerializeField] private AudioClip[] _warningTimer;
 
     public AudioClip[] Chop { get => _chop; }
     public AudioClip[] DeliveryFail { get => _deliveryFail; }
@@ -24,4 +25,5 @@ public class AudioClipRefsSO : ScriptableObject
     public AudioClip[] Trash { get => _trash; }
     public AudioClip[] Warning { get => _warning; }
     public AudioClip[] StoveSizzle { get => _stoveSizzle; }
+    public AudioClip[] WarningTimer { get => _warningTimer; }
 }

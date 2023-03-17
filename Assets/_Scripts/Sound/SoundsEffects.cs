@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SoundsEffects : MonoBehaviour
 {
@@ -109,5 +110,10 @@ public class SoundsEffects : MonoBehaviour
     public void PlayBurnWarningSound(Vector3 position)
     {
         PlaySound(_audioClipRefsSO.Warning, position);
+    }
+
+    public void PlayeWarningTimerSound()
+    {
+        PlaySound(_audioClipRefsSO.WarningTimer, Camera.main.transform.position);
     }
 }

@@ -68,7 +68,7 @@ Transform:
   - {fileID: 8696916813742879210}
   - {fileID: 3933243216168303892}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3664573503036086686
 MonoBehaviour:
@@ -91,13 +91,13 @@ MonoBehaviour:
     m_Bits: 64
   _rotateSpeed: 15
   _speed: 6
-  _playerRadius: 0.8
+  _playerRadius: 0.5
   _raycastDistance: 2
   _spawnPositionList:
-  - {x: -2, y: 0, z: 0}
-  - {x: 2, y: 0, z: 0}
-  - {x: -2, y: 0, z: -2}
-  - {x: 2, y: 0, z: -2}
+  - {x: -4, y: 0, z: -2}
+  - {x: -4, y: 0, z: 2}
+  - {x: 0, y: 0, z: -2}
+  - {x: 0, y: 0, z: 2}
   _playerVisual: {fileID: 1054805471850775908}
 --- !u!114 &3059940847486045942
 MonoBehaviour:

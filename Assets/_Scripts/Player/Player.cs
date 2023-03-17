@@ -69,6 +69,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             LocalInstance = this;
 
         transform.position = _spawnPositionList[KitchenGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId)];
+        transform.rotation = new Quaternion(0f, -180, 0f, 0);
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
 
         if (IsServer)
