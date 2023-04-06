@@ -8,6 +8,8 @@ ___The game___ has customizable controls that allow players to configure control
 
 ___The single game___ mode is also present. If the player wants to play without a net and one, he can do it.
 
+___The game___ has a nice UI and the ability to pause on esc.
+
 ![game screen png](GameScreen.jpg)
 
 ## How to play the game
