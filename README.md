@@ -12,7 +12,7 @@ ___The single game___ mode is also present. If the player wants to play without 
 
 ## How to play the game
 
-Download this zip archive __[zip file]("Hell's Kitchen.zip")__, unpack it and run the executable file Hell’s Kitchen.exe. 
+Download this zip archive __[zip file](Hell%27s%20Kitchen.zip)__, unpack it and run the executable file Hell’s Kitchen.exe. 
 
 ## Used plugins:
 
