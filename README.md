@@ -6,7 +6,7 @@ ___Players___ are given the opportunity to create public and private lobbies. Th
 
 ___The game___ has customizable controls that allow players to configure controls on both the keyboard and gamepads. 
 
-___The single game__ mode is also present. If the player wants to play without a net and one, he can do it.
+___The single game___ mode is also present. If the player wants to play without a net and one, he can do it.
 
 ![game screen png](GameScreen.jpg)
 
