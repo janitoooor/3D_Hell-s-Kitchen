@@ -1,6 +1,6 @@
 # About the project:
 
-___"Hell's Kitchen"___ is my own pet project. It's a multiplayer game for PC and consoles with the ability to play up to four people. It is reminiscent of Overcooked2
+___"Hell's Kitchen"___ is my own pet project. It's a multiplayer game for PC and consoles with the ability to play up to four people. It is reminiscent of "Overcooked2".
 
 ___Players___ are given the opportunity to create public and private lobbies. There is also a waiting room for players and the game it self is synchronized. 
 
